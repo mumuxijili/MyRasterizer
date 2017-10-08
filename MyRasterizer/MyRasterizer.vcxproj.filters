@@ -13,9 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{f18af973-8a8a-47e5-8e6c-234d1a27e8bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="BasicShader.hlsl">
+      <Filter>Source Files\Shaders</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -30,12 +36,21 @@
     <ClInclude Include="MyRasterizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Math3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyRasterizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math3D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
