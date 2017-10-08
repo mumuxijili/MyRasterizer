@@ -16,9 +16,13 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <cassert>
 #include <ctime>
 #include <string>
+#include <vector>
 
 
 // TODO: reference additional headers your program requires here
 //#include "Util.h"
+//const static int WinWidth = 1024;
+//const static int WinHeight = 768;

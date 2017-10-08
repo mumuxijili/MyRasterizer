@@ -2,9 +2,10 @@
 //
 
 #include "stdafx.h"
-#include "MyRasterizer.h"
-#include "Math3D.h"
 #include "Util.h"
+#include "Math3D.h"
+#include "Render.h"
+#include "MyRasterizer.h"
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
@@ -57,6 +58,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+#ifdef CONSOLE
 	//----begin yang chao
 	//----create console
 	AllocConsole();   // 建立控制台
@@ -81,6 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	}
 	//----end yang chao
+#endif
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -147,10 +150,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CleanD3D();
 #endif // D3D
 
+#ifdef CONSOLE
 	//----begin yang chao
 	//destroy console
 	FreeConsole();//销毁控制台
 	//----end yang chao
+#endif
     return (int) msg.wParam;
 }
 
@@ -196,11 +201,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
-   //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+	//HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	  // CW_USEDEFAULT, 0, WinWidth, WinHeight, nullptr, nullptr, hInstance, nullptr);
 
-   g_hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-	   CW_USEDEFAULT, 0, WinWidth, WinHeight, nullptr, nullptr, hInstance, nullptr);
+	// calculate the size of the client area  
+	RECT wr = { 0, 0, WinWidth, WinHeight };    // set the size, but not the position  
+	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, TRUE);    // adjust the size  
+	g_hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+	   CW_USEDEFAULT, 0, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!g_hWnd)
    {
@@ -350,8 +358,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//hdc = GetDC(hWnd);
 			compatibleDC = CreateCompatibleDC(hdc);
 			HBITMAP mBitmap = CreateCompatibleBitmap(hdc, WinWidth, WinHeight);
-			//Todo: update dwFrameBuffer here
-			//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////Todo: update dwFrameBuffer here//////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			clock_t start = clock();//paint start clock
 			{
 				SYSTEMTIME time = { 0 };
@@ -360,10 +369,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				for (int i = 0; i < WinHeight; i++)
 					for (int j = 0; j < WinWidth; j++)
 					{
-						dwFrameBuffer[i * WinWidth + j] = ((blue)+((0) << 8) + ((0) << 16) + ((0) << 24));
+						int r, g, b;
+						r = (int)(((double)i / WinHeight) * 255);
+						g = (int)(((double)j / WinWidth) * 255);
+						dwFrameBuffer[i * WinWidth + j] = RGBA(r, g, blue);
 					}
+				DrawLine(0, 0, 0, 767, ColorBlack);
+				DrawLine(0, 0, 1023, 0, ColorBlack);
+				DrawLine(0, 767, 1023, 767, ColorBlack);
+				DrawLine(1023, 0, 1023, 767, ColorBlack);
 			}
 			clock_t stop = clock();//paint end clock
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			//calculate fps
 			double dur = (double)(stop - start) / (double)CLOCKS_PER_SEC;
 			int fps = (int)min(1000, 1.0 / dur);

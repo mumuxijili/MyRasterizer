@@ -47,7 +47,7 @@ bool Mat4::operator==(const Mat4 &mat) const {
 	return true;
 }
 
-//m1 = m2 + m3
+// m1 = m2 + m3
 Mat4 Mat4::operator+(const Mat4 &mat) const
 {
 	Mat4 m2;
@@ -57,7 +57,7 @@ Mat4 Mat4::operator+(const Mat4 &mat) const
 	return m2;
 }
 
-//m1 = m2 - m3;
+// m1 = m2 - m3;
 Mat4 Mat4::operator-(const Mat4 &mat) const
 {
 	Mat4 m2;
@@ -67,7 +67,7 @@ Mat4 Mat4::operator-(const Mat4 &mat) const
 	return m2;
 }
 
-//m1 = m2 * m3
+// m1 = m2 * m3
 Mat4 Mat4::operator*(const Mat4 &mat) const
 {
 	Mat4 m2;

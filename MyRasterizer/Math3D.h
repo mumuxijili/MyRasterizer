@@ -1,5 +1,7 @@
 #pragma once
 #include <cmath>
+#include <vector>
+using namespace std;
 
 /*
 	4 element Vector, +, -, *(scalar, vector dot mul), +=, -=, *=, [], ==. !=
@@ -34,18 +36,18 @@ public:
 		return Vec4(x - v.x, y - v.y, z - v.z, w - v.w);
 	}
 
-	//scalar multiply
+	// scalar multiply
 	Vec4 operator*(float s) const
 	{
 		return Vec4(x * s, y * s, z * s, w * s);
 	}
 
-	//vector multiply
+	// vector multiply
 	Vec4 operator*(const Vec4 &v) const
 	{
 		return Vec4(x * v.x, y * v.y, z * v.z, w * v.w);
 	}
-	//matrix multiply
+	// matrix multiply
 	Vec4 operator*(const Mat4 &mat) const;
 	//{
 	//	return Vec4(x*mat.m[0][0] + y*mat.m[1][0] + z*mat.m[2][0] + w*mat.m[3][0],
@@ -56,9 +58,9 @@ public:
 	//	return Vec4()
 	//}
 
-	//dot multiply func
+	// dot multiply func
 	float Dot(const Vec4 &v) const;
-	//cross multiply func
+	// cross multiply func
 	Vec4 Cross(const Vec4 &v) const;
 
 	Vec4& operator+=(const Vec4 &v)
@@ -73,7 +75,7 @@ public:
 		return *this;
 	}
 
-	//scalar multiply
+	// scalar multiply
 	Vec4& operator*=(float s)
 	{
 		x *= s; y *= s; z *= s;
