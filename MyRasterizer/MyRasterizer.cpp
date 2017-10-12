@@ -21,9 +21,12 @@ using namespace std;
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-HBITMAP g_hBMP = NULL;
-HWND g_hWnd = NULL;
+HBITMAP m_hBMP = NULL;
+HWND m_hWnd = NULL;
 
+Render* m_render = new Render();
+
+void DrawLabel(HDC hdc, LPCSTR str, int lineNum);
 
 #ifdef D3D
 IDXGISwapChain *swapchain;
@@ -34,10 +37,10 @@ ID3D11InputLayout *pLayout;            // the pointer to the input layout
 ID3D11VertexShader *pVS;               // the pointer to the vertex shader
 ID3D11PixelShader *pPS;                // the pointer to the pixel shader
 ID3D11Buffer *pVBuffer;                // the pointer to the vertex buffer
-#endif // D3D
 
 // a struct to define a single vertex
 struct VERTEX { FLOAT X, Y, Z; Vec4 Color; };
+#endif // D3D
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -122,8 +125,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //		for (int i = 0; i < WinHeight; i++)
 //			for (int j = 0; j < WinWidth; j++)
 //				dwFrameBuffer[i * WinWidth + j] = red;
-//		InvalidateRect(g_hWnd, nullptr, true);
-//		UpdateWindow(g_hWnd);
+//		InvalidateRect(m_hWnd, nullptr, true);
+//		UpdateWindow(m_hWnd);
 //
 //#ifdef D3D
 //		RenderFrame();
@@ -140,8 +143,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
-			InvalidateRect(g_hWnd, nullptr, true);
-			UpdateWindow(g_hWnd);
+			InvalidateRect(m_hWnd, nullptr, true);
+			UpdateWindow(m_hWnd);
 		}
 	}
 
@@ -207,16 +210,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	// calculate the size of the client area  
 	RECT wr = { 0, 0, WinWidth, WinHeight };    // set the size, but not the position  
 	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, TRUE);    // adjust the size  
-	g_hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+	m_hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	   CW_USEDEFAULT, 0, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr, hInstance, nullptr);
 
-   if (!g_hWnd)
+   if (!m_hWnd)
    {
       return FALSE;
    }
 
-   ShowWindow(g_hWnd, nCmdShow);
-   UpdateWindow(g_hWnd);
+   ShowWindow(m_hWnd, nCmdShow);
+   UpdateWindow(m_hWnd);
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   m_render->InitRender();
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef D3D
    // set up and initialize Direct3D
@@ -280,8 +289,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		{
 #ifdef PAINTLENNA
-			g_hBMP = (HBITMAP)LoadImage(NULL, L"Image/Lenna.bmp", IMAGE_BITMAP, 512, 512, LR_LOADFROMFILE);
-			if (g_hBMP == NULL)
+			m_hBMP = (HBITMAP)LoadImage(NULL, L"Image/Lenna.bmp", IMAGE_BITMAP, 512, 512, LR_LOADFROMFILE);
+			if (m_hBMP == NULL)
 				MessageBox(hWnd, L"Could not load Image/Lenna.bmp!", L"Error", MB_OK | MB_ICONEXCLAMATION);
 #endif
 
@@ -340,10 +349,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 			HDC hdcMem = CreateCompatibleDC(hdc);
-			SelectObject(hdcMem, g_hBMP);
+			SelectObject(hdcMem, m_hBMP);
 
 			BitBlt(hdc, 0, 0, 512, 512, hdcMem, 0, 0, SRCCOPY);
-			DeleteObject(g_hBMP);
+			DeleteObject(m_hBMP);
 			DeleteDC(hdcMem);
 			EndPaint(hWnd, &ps);
 #endif
@@ -358,11 +367,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//hdc = GetDC(hWnd);
 			compatibleDC = CreateCompatibleDC(hdc);
 			HBITMAP mBitmap = CreateCompatibleBitmap(hdc, WinWidth, WinHeight);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////Todo: update dwFrameBuffer here//////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			clock_t start = clock();//paint start clock
 			{
+				//
+				// something like: RenderScene();
+				//
 				SYSTEMTIME time = { 0 };
 				GetLocalTime(&time);
 				int blue = (int)((double)time.wMilliseconds / 1000 * 255);
@@ -372,27 +385,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						int r, g, b;
 						r = (int)(((double)i / WinHeight) * 255);
 						g = (int)(((double)j / WinWidth) * 255);
-						dwFrameBuffer[i * WinWidth + j] = RGBA(r, g, blue);
+						//dwFrameBuffer[i * WinWidth + j] = RGBA(r, g, blue);
+						//dwFrameBuffer[i * WinWidth + j] = ColorBlack;
+						dwFrameBuffer[i * WinWidth + j] = RGB(r, g, blue);
 					}
-				DrawLine(0, 0, 0, 767, ColorBlack);
-				DrawLine(0, 0, 1023, 0, ColorBlack);
-				DrawLine(0, 767, 1023, 767, ColorBlack);
-				DrawLine(1023, 0, 1023, 767, ColorBlack);
+				m_render->DrawLine(0, 0, 0, 767, ColorBlack);
+				m_render->DrawLine(0, 0, 1023, 0, ColorBlack);
+				m_render->DrawLine(0, 767, 1023, 767, ColorBlack);
+				m_render->DrawLine(1023, 0, 1023, 767, ColorBlack);
+
+				// Vertex should has screen space coordinate
+				Vertex v0, v1, v2;
+				v0.m_SSCoord = Vec4(100, 100, 100, 1);
+				v1.m_SSCoord = Vec4(500, 100, 100, 1);
+				v2.m_SSCoord = Vec4(100, 200, 100, 1);
+				v0.m_vertexNorm = Vec4(0.0, 0.0, 1.0, 0.0);
+				v1.m_vertexNorm = Vec4(0.0, 0.0, 1.0, 0.0);
+				v2.m_vertexNorm = Vec4(0.0, 0.0, 1.0, 0.0);
+				v0.m_vertexColor = ColorBLUE;
+				v1.m_vertexColor = ColorGREEN;
+				v2.m_vertexColor = ColorRED;
+				m_render->DrawTrianglePlaneBottom(v2, v1, v0);
+				v0.m_SSCoord += Vec4(700, 0, 0, 0);
+				v1.m_SSCoord += Vec4(500, 100, 0, 0);
+				v2.m_SSCoord += Vec4(500, 0, 0, 0);
+				m_render->DrawTrianglePlaneTop(v2, v1, v0);
+				v0.m_SSCoord += Vec4(-600, 200, 0, 0);
+				v1.m_SSCoord += Vec4(-500, 0, 0, 0);
+				v2.m_SSCoord += Vec4(-200, 300, 0, 0);
+				m_render->DrawSolidTriangle(v0, v1, v2);
+				for (int i = 0; i < 10; i++)
+				{
+					v0.m_SSCoord += Vec4(25, 0, 0, 0);
+					v1.m_SSCoord += Vec4(25, 0, 0, 0);
+					v2.m_SSCoord += Vec4(25, 0, 0, 0);
+					m_render->DrawSolidTriangle(v0, v1, v2);
+				}
+				//m_render->DrawTriangle(v0, v1, v2);
 			}
 			clock_t stop = clock();//paint end clock
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+			SetDIBits(compatibleDC, mBitmap, 0, WinHeight, dwFrameBuffer, &bmpInfo, DIB_PAL_COLORS);
+			SelectObject(compatibleDC, mBitmap);
 			//calculate fps
 			double dur = (double)(stop - start) / (double)CLOCKS_PER_SEC;
 			int fps = (int)min(1000, 1.0 / dur);
-			//
-			SetDIBits(compatibleDC, mBitmap, 0, WinHeight, dwFrameBuffer, &bmpInfo, DIB_PAL_COLORS);
-			SelectObject(compatibleDC, mBitmap);
-			//--draw text
-			SetTextColor(compatibleDC, RGB(255, 255, 255));
-			SetBkMode(compatibleDC, TRANSPARENT);
+			// draw fps
 			char fpsstr[32];
 			sprintf_s(fpsstr, "FPS: %d", fps);
-			TextOutA(compatibleDC, 0, 5 + 20 * 2, fpsstr, strlen(fpsstr));
+			DrawLabel(compatibleDC, fpsstr, 1);
 
 			// draw bitmap
 			BitBlt(hdc, 0, 0, WinWidth, WinHeight, compatibleDC, 0, 0, SRCCOPY);
@@ -433,6 +476,16 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+void DrawLabel(HDC hdc, LPCSTR str, int lineNum)
+{
+	//--draw text
+	SetTextColor(hdc, RGB(255, 255, 255));
+	SetBkMode(hdc, TRANSPARENT);
+	//char fpsstr[32];
+	//sprintf_s(fpsstr, "FPS: %d", fps);
+	TextOutA(hdc, 0, 17 * lineNum, str, strlen(str));
 }
 
 #ifdef D3D

@@ -101,3 +101,24 @@ Vec4 Mat4::Col(int c) const
 {
 	return Vec4(m[0][c], m[1][c], m[2][c], m[3][c]);
 }
+
+void Mat4::SetCol(int c, Vec4 col)
+{
+	m[0][c] = col.x;
+	m[1][c] = col.y;
+	m[2][c] = col.z;
+	m[3][c] = col.w;
+}
+
+Vec4 Mat4::Row(int r) const
+{
+	return Vec4(m[r][0], m[r][1], m[r][2], m[r][3]);
+}
+
+void Mat4::SetRow(int r, Vec4 row)
+{
+	m[r][0] = row.x;
+	m[r][1] = row.y;
+	m[r][2] = row.z;
+	m[r][3] = row.w;
+}

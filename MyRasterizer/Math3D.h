@@ -258,6 +258,9 @@ public:
 	Mat4 Transpose(const Mat4 &mat);
 	void SetZero();
 	Vec4 Col(int c) const;
+	void SetCol(int c, Vec4 col);
+	Vec4 Row(int r) const;
+	void SetRow(int r, Vec4 row);
 private:
 	float m[4][4];
 };
