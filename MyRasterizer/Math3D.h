@@ -42,7 +42,7 @@ public:
 		return Vec4(x * s, y * s, z * s, w * s);
 	}
 
-	// vector multiply
+	// per element multiply
 	Vec4 operator*(const Vec4 &v) const
 	{
 		return Vec4(x * v.x, y * v.y, z * v.z, w * v.w);

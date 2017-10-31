@@ -46,3 +46,9 @@ Vec4 LerpVector(Vec4 vStart, Vec4 vEnd, float t);
 //	std::string numStr = numbuf;
 //	return numStr;
 //}
+
+//inline bool isFloatZero(float f)
+//{
+//	if ((f > -EPSINON) || (f < EPSINON)) return true;
+//	else return false;
+//}

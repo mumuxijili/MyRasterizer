@@ -427,10 +427,30 @@ Mat4 Render::WorldtoModelMatrix()
 	return inverseworldmatrix;
 }
 
-Mat4 Render::WorldtoViewMatrix()
+Mat4 Render::WorldtoViewMatrix(Camera cam)
 {
 	Mat4 viewmatrix = Mat4();
+	Vec4 v = Vec4(0, 1, 0, 0);
+	Vec4 n = cam.m_Dir.normalize();
+	Vec4 u = v.Cross(n);
+	u.w = 0;
+	u.normalize();
+	v = n.Cross(u);
+	v.w = 0;
+	v.normalize();
+	viewmatrix.SetCol(0, u);
+	viewmatrix.SetCol(1, v);
+	viewmatrix.SetCol(2, n);
+	float camx = -(cam.m_Pos.Dot(u));
+	float camy = -(cam.m_Pos.Dot(v));
+	float camz = -(cam.m_Pos.Dot(n));
+	viewmatrix.SetRow(3, Vec4(camx, camy, camz, 1));
 	return viewmatrix;
+}
+
+Mat4 Render::PerspectiveProjectionMatrix(Camera cam)
+{
+	return Mat4();
 }
 
 void Render::RenderPipeline()

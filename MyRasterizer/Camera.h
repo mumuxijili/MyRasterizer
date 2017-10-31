@@ -7,7 +7,7 @@ class Camera
 public:
 	Camera() {};
 	~Camera() {};
-	Camera(Vec4 pos, Vec4 dir, float fov, float near, float far);
+	Camera(Vec4 pos, Vec4 dir, float fov, float fnear, float ffar);
 	Vec4 m_Pos; // camera position(world space)
 
 
@@ -33,4 +33,6 @@ public:
 
 	float m_ViewportWidth; // screen/viewport size
 	float m_ViewportHeight;
+
+	Mat4 m_worldToView = Mat4();
 };

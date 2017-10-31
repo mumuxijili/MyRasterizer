@@ -34,8 +34,11 @@ public:
 
 	Mat4 ModeltoWorldMatrix();
 	Mat4 WorldtoModelMatrix();
-	Mat4 WorldtoViewMatrix();
-	Mat4 WorldtoViewMatrixInverse();
+	Mat4 WorldtoViewMatrix(Camera cam);
+	//Mat4 ViewtoWorldMatrix();
+	Mat4 PerspectiveProjectionMatrix(Camera cam);
+	//Mat4 OrthoProjectionMatrix();
+	Mat4 PerspectiveToScreenMatrix();
 
 	void RenderPipeline();
 
